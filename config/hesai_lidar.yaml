@@ -1,0 +1,25 @@
+lidar:
+  - driver:
+      source_type: 1
+      lidar_ip: 192.168.1.201
+      host_ip: 192.168.1.100
+      udp_port: 2368
+      ptc_port: 9347
+      multicast_ip: ""
+      correction_file_path: ""
+      firetimes_path: ""
+      standby_mode: 0
+      speed: 600
+      remove_nans: true
+      use_timestamp_type: 0
+
+    ros:
+      ros_frame_id: hesai_lidar
+      ros_recv_packet_topic: /lidar_packets
+      ros_send_packet_topic: /lidar_packets
+      ros_pointcloud_topic: /hesai/pandar
+      send_packet_ros: false
+      send_point_cloud_ros: true
+      output_point_type: 0
+
+    lidar_type: "PandarXT"
