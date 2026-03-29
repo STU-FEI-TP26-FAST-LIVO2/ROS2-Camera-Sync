@@ -1,7 +1,11 @@
 build/
 install/
 log/
+logs/
 .vscode/
 .idea/
-*.pyc
+*.log
+*.tmp
+*.swp
 __pycache__/
+*.pyc
