@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Cyclone DDS config pro LiDAR + Kamera synchronizaci.
+  Konfiguruje optimalni buffer, multicast a interface selection.
+
+  Pred spustenim musi byt nastaveny kernel buffer:
+    sudo sysctl -w net.core.rmem_max=2147483647
+  alebo trvalo cez: system/60-ros2-buffers.conf
+
+  Network Interface:
+  - Explicitne nastavujeme eno1 (Hesai LiDAR)
+  - Multicast je VYPNUTY (lokalna komunikacia)
+  - Deterministicka latencia
+-->
+<CycloneDDS
+  xmlns="https://cdds.io/config"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://cdds.io/config
+    https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+
+  <Domain id="any">
+    <General>
+      <!-- Explicitna konfigurace network interface -->
+      <!-- Pouzijeme ONLY eno1 interface (Hesai + camera) -->
+      <!-- Vypneme multicast aby nedoslo k interferencii s WiFi -->
+      <AllowMulticast>true</AllowMulticast>
+      <MaxMessageSize>65500B</MaxMessageSize>
+      
+      <!-- Network interface selection: eno1 pre LiDAR+camera -->
+      <!-- Format: interface_name (ziskane z: ip link show) -->
+      <NetworkInterface name="eno1" priority="high" autodetermine="false"/>
+    </General>
+
+    <Internal>
+      <!-- Socket receive buffer tuning (kernel rmem_max musi byt >= ) -->
+      <SocketReceiveBufferSize min="10MB"/>
+      
+      <!-- WHC watermarks - umoznuje vysoke throughput bez buffer overflow -->
+      <Watermarks>
+        <WhcHigh>500kB</WhcHigh>
+      </Watermarks>
+      
+      <!-- TCP tuning pre deterministicku latency -->
+      <TCPSettings>
+        <TcpNoDlay>true</TcpNoDlay>
+        <TcpReadBufSize>1MB</TcpReadBufSize>
+        <TcpWriteBufSize>1MB</TcpWriteBufSize>
+      </TCPSettings>
+    </Internal>
+
+    <Tracing>
+      <!-- Verbosity: silent, warning, config, info -->
+      <Verbosity>config</Verbosity>
+      <OutputFile>stderr</OutputFile>
+    </Tracing>
+  </Domain>
+
+</CycloneDDS>

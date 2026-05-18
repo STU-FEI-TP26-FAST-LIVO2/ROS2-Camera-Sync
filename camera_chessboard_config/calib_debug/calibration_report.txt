@@ -1,0 +1,22 @@
+KALIBRACIA BASLER KAMERY
+=======================
+
+images_dir: /home/jetson/ROS2-Camera-Sync-dominik/camera_chessboard_config/fotky
+image_width: 1920
+image_height: 1200
+cols: 5
+rows: 3
+square_mm: 40.0
+used_images: 201
+rejected_images: 0
+rms: 0.3216976476440658
+mean_reprojection_error_px: 0.07922351001554624
+rms_like_reprojection_error_px: 0.3216981238952291
+
+camera_matrix:
+[[1.74755641e+03 0.00000000e+00 9.46197620e+02]
+ [0.00000000e+00 1.75427737e+03 5.89306874e+02]
+ [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+
+dist_coeffs:
+[-0.27886535  0.24860986 -0.00044621  0.00093333 -0.44050717]

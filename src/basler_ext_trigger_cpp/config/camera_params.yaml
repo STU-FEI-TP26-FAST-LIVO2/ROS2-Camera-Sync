@@ -1,0 +1,46 @@
+basler_ext_trigger_cpp_node:
+  ros__parameters:
+    serial_number: ""
+    device_user_id: ""
+    load_user_set: "UserSet1"
+
+    output_dir: "~/basler_trigger_output_cpp"
+    save_images: false
+    publish_ros: true
+
+    image_topic: "/basler/image_raw"
+    frame_id: "basler_camera"
+
+    image_format: "png"
+    jpeg_quality: 95
+    max_images: 0
+    grab_timeout_ms: 1000
+
+    acquisition_mode: "Continuous"
+    exposure_mode: "Timed"
+    exposure_time_us: 3000.0
+
+    trigger_selector: "FrameStart"
+    trigger_source: "Line1"
+    trigger_activation: "RisingEdge"
+    trigger_mode: "On"
+
+    line_inverter: false
+    line_debouncer_us: 0.0
+    chunk_line_status_all: true
+
+    enable_mmap: true
+    mmap_path: "/dev/shm/liv_sync_ring.bin"
+    mmap_slots: 256
+    compat_stamp_path: "/dev/shm/liv_sync_stamp"
+
+    use_lidar_stamp_for_ros_header: true
+    lidar_mmap_path: "/dev/shm/lidar_stamp.bin"
+    matches_csv_path: "/home/jetson/ROS2-Camera-Sync-dominik/Matching/Matches.csv"
+    match_threshold_ms: 100
+    lidar_reader_retry_ms: 500
+    enforce_monotonic_lidar_seq: true
+
+    sensor_data_qos: false
+    queue_depth: 10
+    reliability: reliable

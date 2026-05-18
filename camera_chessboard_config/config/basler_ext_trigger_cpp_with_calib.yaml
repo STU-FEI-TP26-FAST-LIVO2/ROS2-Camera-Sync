@@ -1,0 +1,51 @@
+basler_ext_trigger_cpp_node:
+  ros__parameters:
+    serial_number: ""
+    device_user_id: ""
+    load_user_set: "UserSet1"
+
+    # Vystup obrazkov/logov
+    output_dir: "~/camera_chessboard_config/config_hotovo"
+    save_images: true
+    publish_ros: true
+    image_topic: "/basler/image_raw"
+    frame_id: "basler_camera"
+    image_format: "png"
+    jpeg_quality: 95
+    max_images: 0
+    grab_timeout_ms: 1000
+
+    # Jednorazova kalibracia zo sachovnice - tento subor vytvori calibrate_chessboard.py
+    calibration_file: "/home/jetson/ROS2-Camera-Sync-dominik/config/basler_chessboard_ros.yaml"
+    camera_info_topic: "/basler/camera_info"
+    publish_camera_info: true
+
+    # Nastavenie kamery pre synchronizaciu
+    acquisition_mode: "Continuous"
+    exposure_mode: "Timed"
+    exposure_time_us: 3000.0
+    trigger_selector: "FrameStart"
+    trigger_source: "Line1"
+    trigger_activation: "RisingEdge"
+    trigger_mode: "On"
+    line_inverter: false
+    line_debouncer_us: 0.0
+    chunk_line_status_all: true
+
+    # Shared memory pre sync
+    enable_mmap: true
+    mmap_path: "/dev/shm/liv_sync_ring.bin"
+    mmap_slots: 256
+    compat_stamp_path: "/dev/shm/liv_sync_stamp"
+
+    use_lidar_stamp_for_ros_header: true
+    lidar_mmap_path: "/dev/shm/lidar_stamp.bin"
+    matches_csv_path: "/home/jetson/ROS2-Camera-Sync-dominik/Matching/Matches.csv"
+    match_threshold_ms: 100
+    lidar_reader_retry_ms: 500
+    enforce_monotonic_lidar_seq: true
+
+    # QoS pre image publisher
+    sensor_data_qos: false
+    queue_depth: 10
+    reliability: reliable
