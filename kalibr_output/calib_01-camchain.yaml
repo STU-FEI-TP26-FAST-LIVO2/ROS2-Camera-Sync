@@ -1,0 +1,8 @@
+cam0:
+  cam_overlaps: []
+  camera_model: pinhole
+  distortion_coeffs: [-0.2582402055557321, 0.1103754050615003, 0.00046330448609772164, 0.0006145205675222398]
+  distortion_model: radtan
+  intrinsics: [1763.1625584595981, 1766.3557371185052, 958.1280601924927, 588.9035443658784]
+  resolution: [1920, 1200]
+  rostopic: /my_camera/pylon_ros2_camera_node/image_raw

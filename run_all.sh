@@ -21,7 +21,6 @@ BRIDGE_SETUP="$BRIDGE_WS/install/setup.bash"
 CAMERA_SETUP="$CAMERA_WS/install/setup.bash"
 FAST_SETUP="$FAST_WS/install/setup.bash"
 
-MATCH_DIR="$CAMERA_WS/Matching"
 
 # ============================================================
 # LOGY TERMINALOV
@@ -74,7 +73,6 @@ for candidate in "${CYCLONE_XML_CANDIDATES[@]}"; do
   fi
 done
 
-mkdir -p "$MATCH_DIR"
 mkdir -p "$TERMINAL_LOG_DIR"
 
 exec > >(tee -a "$MAIN_LOG") 2>&1
@@ -413,7 +411,7 @@ wait_for_topic_common "/lidar_points" 40 || true
 echo
 echo "Spustam LiDAR Stamp Bridge v terminali..."
 run_term_with_env "LiDAR Stamp Bridge" "$BRIDGE_WS" "$TERMINAL_LOG_DIR/lidar_stamp_bridge.txt" "$BRIDGE_ENV_BLOCK" \
-  "ros2 run lidar_stamp_bridge lidar_stamp_bridge_node --ros-args -p topic:=/lidar_points -p mmap_path:=/dev/shm/lidar_stamp.bin -p csv_path:=$TERMINAL_LOG_DIR/lidar_stamp_log.csv"
+  "ros2 run lidar_stamp_bridge lidar_stamp_bridge_node --ros-args -p topic:=/lidar_points -p mmap_path:=/dev/shm/lidar_stamp.bin"
 
 sleep 3
 

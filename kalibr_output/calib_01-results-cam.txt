@@ -1,0 +1,20 @@
+Calibration results 
+====================
+Camera-system parameters:
+cam0 (/my_camera/pylon_ros2_camera_node/image_raw):
+    type: <class 'aslam_cv.libaslam_cv_python.DistortedPinholeCameraGeometry'>
+    distortion: [-0.25824021  0.11037541  0.0004633   0.00061452] +- [0.00166808 0.00407996 0.00013565 0.00011853]
+    projection: [1763.16255846 1766.35573712  958.12806019  588.90354437] +- [2.39266375 2.25484717 2.44948602 2.21825571]
+    reprojection error: [-0.000000, -0.000000] +- [0.300643, 0.244253]
+
+
+
+Target configuration
+====================
+
+  Type: aprilgrid
+  Tags: 
+    Rows: 6
+    Cols: 6
+    Size: 0.088 [m]
+    Spacing 0.026399999999999996 [m]

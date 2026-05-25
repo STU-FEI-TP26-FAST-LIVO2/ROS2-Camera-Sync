@@ -1,18 +1,3 @@
-# Jednorazova kalibracia Basler kamery zo sachovnice pre sync
-
-Ciel: raz nafotit sachovnicu, vytvorit jeden kalibracny config a potom ho stale pouzivat pri synchronizacii.
-
-## 1. Kam to skopirovat
-
-```bash
-cd ~/ROS2-Camera-Sync-dominik
-cp -r camera_chessboard_config .
-cd camera_chessboard_config
-bash setup_camera_calib_venv.sh
-```
-
-## 2. Nafot sachovnicu
-
 Do configu kamery docasne nastav:
 
 ```yaml

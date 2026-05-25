@@ -21,6 +21,7 @@ execute_process(
   OUTPUT_VARIABLE PYLON_CFLAGS_RAW
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
 execute_process(
   COMMAND ${PYLON_CONFIG_EXECUTABLE} --libs
   OUTPUT_VARIABLE PYLON_LIBS_RAW
@@ -32,6 +33,7 @@ separate_arguments(PYLON_LIBS NATIVE_COMMAND "${PYLON_LIBS_RAW}")
 
 set(PYLON_INCLUDE_DIRS "")
 set(PYLON_COMPILE_OPTIONS "")
+
 foreach(flag ${PYLON_CFLAGS})
   if(flag MATCHES "^-I(.*)")
     list(APPEND PYLON_INCLUDE_DIRS "${CMAKE_MATCH_1}")
@@ -43,6 +45,7 @@ endforeach()
 set(PYLON_LINK_DIRS "")
 set(PYLON_LINK_LIBS "")
 set(PYLON_LINK_OPTIONS "")
+
 foreach(flag ${PYLON_LIBS})
   if(flag MATCHES "^-L(.*)")
     list(APPEND PYLON_LINK_DIRS "${CMAKE_MATCH_1}")
@@ -64,30 +67,42 @@ target_include_directories(ext_trigger_node PRIVATE
 )
 
 target_compile_features(ext_trigger_node PUBLIC cxx_std_17)
-target_compile_options(ext_trigger_node PRIVATE ${PYLON_COMPILE_OPTIONS})
-target_link_directories(ext_trigger_node PRIVATE ${PYLON_LINK_DIRS})
-target_link_options(ext_trigger_node PRIVATE ${PYLON_LINK_OPTIONS})
-target_link_libraries(ext_trigger_node ${PYLON_LINK_LIBS} ${OpenCV_LIBS})
-ament_target_dependencies(ext_trigger_node rclcpp sensor_msgs cv_bridge)
 
-# LiDAR Stamp Bridge - monitoring node
-add_executable(lidar_stamp_bridge
-  src/lidar_stamp_bridge.cpp
+target_compile_options(ext_trigger_node PRIVATE
+  ${PYLON_COMPILE_OPTIONS}
 )
 
-target_include_directories(lidar_stamp_bridge PRIVATE
-  include
+target_link_directories(ext_trigger_node PRIVATE
+  ${PYLON_LINK_DIRS}
 )
 
-target_compile_features(lidar_stamp_bridge PUBLIC cxx_std_17)
-ament_target_dependencies(lidar_stamp_bridge rclcpp)
+target_link_options(ext_trigger_node PRIVATE
+  ${PYLON_LINK_OPTIONS}
+)
 
-install(TARGETS ext_trigger_node lidar_stamp_bridge
+target_link_libraries(ext_trigger_node
+  ${PYLON_LINK_LIBS}
+  ${OpenCV_LIBS}
+)
+
+ament_target_dependencies(ext_trigger_node
+  rclcpp
+  sensor_msgs
+  cv_bridge
+)
+
+install(TARGETS ext_trigger_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY include/
+  DESTINATION include
 )
 
 install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
+
+ament_export_include_directories(include)
 
 ament_package()
