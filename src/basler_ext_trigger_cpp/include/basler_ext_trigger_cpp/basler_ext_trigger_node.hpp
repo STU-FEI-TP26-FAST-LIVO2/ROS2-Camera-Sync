@@ -63,7 +63,7 @@ private:
 
   std::string serial_number_;
   std::string device_user_id_;
-  std::string load_user_set_{"UserSet1"};
+  std::string load_user_set_{"UserSet2"};
   bool publish_ros_{true};
   std::string image_topic_{"/basler/image_raw"};
   std::string frame_id_{"basler_camera"};
@@ -72,7 +72,7 @@ private:
 
   std::string acquisition_mode_{"Continuous"};
   std::string exposure_mode_{"Timed"};
-  double exposure_time_us_{3000.0};
+  double exposure_time_us_{300.0};
   std::string trigger_selector_{"FrameStart"};
   std::string trigger_source_{"Line1"};
   std::string trigger_activation_{"RisingEdge"};

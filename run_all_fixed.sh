@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-unset AMENT_PREFIX_PATH
-unset CMAKE_PREFIX_PATH
-unset COLCON_PREFIX_PATH
-unset PYTHONPATH
 
 # ============================================================
 # run_all.sh
@@ -21,9 +17,9 @@ BRIDGE_WS="$HOME/ROS2-LIDAR-CAMERA-BRIDGE-main"
 CAMERA_WS="$HOME/ROS2-Camera-Sync-dominik"
 FAST_WS="$HOME/ROS2-FAST-LIVO2-WS"
 
-BRIDGE_SETUP="$BRIDGE_WS/install/local_setup.bash"
-CAMERA_SETUP="$CAMERA_WS/install/local_setup.bash"
-FAST_SETUP="$FAST_WS/install/local_setup.bash"
+BRIDGE_SETUP="$BRIDGE_WS/install/setup.bash"
+CAMERA_SETUP="$CAMERA_WS/install/setup.bash"
+FAST_SETUP="$FAST_WS/install/setup.bash"
 
 
 # ============================================================
@@ -208,10 +204,6 @@ run_term_with_env() {
   cat > "$runner_file" <<RUNNER
 #!/usr/bin/env bash
 set -Eeuo pipefail
-unset AMENT_PREFIX_PATH
-unset CMAKE_PREFIX_PATH
-unset COLCON_PREFIX_PATH
-unset PYTHONPATH
 cd "$workdir"
 
 $env_block

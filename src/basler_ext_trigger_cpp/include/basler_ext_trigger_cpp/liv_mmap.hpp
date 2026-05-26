@@ -80,7 +80,7 @@ public:
     header_->version = kRingVersion;
     header_->capacity = capacity_;
     header_->record_size = sizeof(RingRecord);
-    if (header_->write_index > capacity_ * 1000000ULL || header_->magic != kRingMagic) {
+    if (header_->write_index > capacity_ * 80000000ULL || header_->magic != kRingMagic) {
       header_->write_index = 0;
     }
   }

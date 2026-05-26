@@ -40,7 +40,7 @@ BaslerExtTriggerNode::BaslerExtTriggerNode()
   // Camera selection and UserSet.
   declare_parameter<std::string>("serial_number", "");
   declare_parameter<std::string>("device_user_id", "");
-  declare_parameter<std::string>("load_user_set", "UserSet1");
+  declare_parameter<std::string>("load_user_set", "UserSet2");
 
   // ROS image output.
   declare_parameter<bool>("publish_ros", true);
@@ -55,7 +55,7 @@ BaslerExtTriggerNode::BaslerExtTriggerNode()
   declare_parameter<int>("grab_timeout_ms", 1000);
   declare_parameter<std::string>("acquisition_mode", "Continuous");
   declare_parameter<std::string>("exposure_mode", "Timed");
-  declare_parameter<double>("exposure_time_us", 3000.0);
+  declare_parameter<double>("exposure_time_us", 300.0);
   declare_parameter<std::string>("trigger_selector", "FrameStart");
   declare_parameter<std::string>("trigger_source", "Line1");
   declare_parameter<std::string>("trigger_activation", "RisingEdge");
@@ -107,13 +107,13 @@ BaslerExtTriggerNode::BaslerExtTriggerNode()
   resync_trigger_dt_ns_ = get_parameter("resync_trigger_dt_ns").as_int();
   resync_trigger_count_ = get_parameter("resync_trigger_count").as_int();
 
-  if (match_threshold_ns_ < 1000000) {
+  if (match_threshold_ns_ < 80000000) {
     RCLCPP_WARN(
       get_logger(),
       "match_threshold_ns=%ld is lower than 1 ms.",
       static_cast<long>(match_threshold_ns_));
   }
-  if (resync_trigger_dt_ns_ < 1000000) {
+  if (resync_trigger_dt_ns_ < 80000000) {
     RCLCPP_WARN(
       get_logger(),
       "resync_trigger_dt_ns=%ld is lower than 1 ms.",
@@ -199,7 +199,7 @@ void BaslerExtTriggerNode::ensure_lidar_reader()
 
   const int64_t now_ns = this->now().nanoseconds();
   const int64_t retry_period_ns =
-    static_cast<int64_t>(std::max(1, lidar_mmap_timeout_ms_)) * 1000000LL;
+    static_cast<int64_t>(std::max(1, lidar_mmap_timeout_ms_)) * 80000000LL;
 
   if (last_lidar_reader_retry_ns_ != 0 &&
       (now_ns - last_lidar_reader_retry_ns_) < retry_period_ns)

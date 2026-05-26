@@ -45,7 +45,7 @@
 
 basler_ext_trigger_cpp_node:
   ros__parameters:
-    exposure_time_us: 3000.0
+    exposure_time_us: 300.0
     trigger_source: "Line1"
     trigger_activation: "RisingEdge"
     trigger_mode: "On"
@@ -60,15 +60,15 @@ basler_ext_trigger_cpp_node:
     reliability: "reliable"
     queue_depth: 10
 
-    match_threshold_ns: 1000000
-    resync_trigger_dt_ns: 1000000
+    match_threshold_ns: 80000000
+    resync_trigger_dt_ns: 80000000
     resync_trigger_count: 3
 
     use_lidar_stamp_for_ros_header: true
     sensor_data_qos: false
     serial_number: ""
     device_user_id: ""
-    load_user_set: "UserSet1"
+    load_user_set: "UserSet2"
     publish_ros: true
     max_images: 0
     grab_timeout_ms: 1000

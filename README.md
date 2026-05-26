@@ -62,7 +62,7 @@ frame_id: "basler_camera"
 trigger_source: "Line1"
 trigger_activation: "RisingEdge"
 trigger_mode: "On"
-exposure_time_us: 3000.0
+exposure_time_us: 300.0
 lidar_mmap_path: "/dev/shm/lidar_stamp.bin"
 use_lidar_stamp_for_ros_header: true
 match_threshold_ns: 40000000
