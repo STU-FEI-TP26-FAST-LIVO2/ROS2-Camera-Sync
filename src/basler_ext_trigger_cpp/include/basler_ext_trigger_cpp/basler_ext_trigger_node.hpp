@@ -57,6 +57,9 @@ private:
   void configure_camera_runtime_only();
   void enable_chunks();
   void start_grabbing();
+  void close_camera_safely();
+  bool connect_camera_once();
+  void wait_and_reconnect_camera();
   void grab_loop();
   void cleanup_used_lidar_seqs();
   void process_frame(const Pylon::CBaslerUniversalGrabResultPtr & ptr);

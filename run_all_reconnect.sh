@@ -417,8 +417,15 @@ sleep 3
 
 echo
 echo "Spustam Basler kameru v terminali..."
-run_term_with_env "Basler Camera" "$CAMERA_WS" "$TERMINAL_LOG_DIR/basler_camera.txt" "$CAMERA_ENV_BLOCK" \
-  "ros2 launch basler_ext_trigger_cpp ext_trigger_camera.launch.py"
+run_term_with_env "Basler Camera" "$CAMERA_WS" "$TERMINAL_LOG_DIR/basler_camera.txt" "$CAMERA_ENV_BLOCK" "
+while true; do
+  echo '===== STARTING BASLER CAMERA NODE ====='
+  ros2 launch basler_ext_trigger_cpp ext_trigger_camera.launch.py
+  code=\$?
+  echo "===== BASLER CAMERA NODE EXITED code=\$code, restarting in 2s ====="
+  sleep 2
+done
+"
 
 sleep 5
 

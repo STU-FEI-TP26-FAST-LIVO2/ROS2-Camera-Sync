@@ -138,9 +138,9 @@ BaslerExtTriggerNode::BaslerExtTriggerNode()
     RCLCPP_WARN(get_logger(), "LiDAR mmap reader not available yet: %s", e.what());
   }
 
-  open_camera();
-  configure_camera_runtime_only();
-  start_grabbing();
+  // Initial connection. If the camera is not present during startup, keep the
+  // ROS node alive and wait until it appears instead of exiting.
+  wait_and_reconnect_camera();
 
   grab_thread_ = std::thread([this]() { grab_loop(); });
 }
@@ -152,15 +152,7 @@ BaslerExtTriggerNode::~BaslerExtTriggerNode()
     grab_thread_.join();
   }
 
-  try {
-    if (camera_.IsGrabbing()) {
-      camera_.StopGrabbing();
-    }
-    if (camera_.IsOpen()) {
-      camera_.Close();
-    }
-  } catch (...) {
-  }
+  close_camera_safely();
 }
 
 rclcpp::QoS BaslerExtTriggerNode::build_qos(
@@ -527,9 +519,82 @@ void BaslerExtTriggerNode::start_grabbing()
     trigger_source_.c_str());
 }
 
+void BaslerExtTriggerNode::close_camera_safely()
+{
+  try {
+    if (camera_.IsGrabbing()) {
+      camera_.StopGrabbing();
+    }
+  } catch (...) {
+  }
+
+  try {
+    if (camera_.IsOpen()) {
+      camera_.Close();
+    }
+  } catch (...) {
+  }
+
+  try {
+    // Important after USB disconnect: release the old Pylon device handle so
+    // CreateDevice() can attach the re-enumerated camera later.
+    camera_.DestroyDevice();
+  } catch (...) {
+  }
+}
+
+bool BaslerExtTriggerNode::connect_camera_once()
+{
+  close_camera_safely();
+
+  open_camera();
+  configure_camera_runtime_only();
+  start_grabbing();
+
+  // After a reconnect, do not let old 1:1 LiDAR pairing state block the new
+  // stream. The next frame will be matched to the current LiDAR mmap record.
+  used_lidar_seqs_.clear();
+  last_matched_lidar_seq_ = 0;
+  resync_unmatched_count_ = 0;
+  resync_mode_active_ = false;
+
+  RCLCPP_INFO(get_logger(), "Camera connected/reconnected and grabbing restarted.");
+  return true;
+}
+
+void BaslerExtTriggerNode::wait_and_reconnect_camera()
+{
+  while (rclcpp::ok() && !stop_requested_) {
+    try {
+      if (connect_camera_once()) {
+        return;
+      }
+    } catch (const GenICam::GenericException & e) {
+      RCLCPP_WARN(
+        get_logger(),
+        "Camera not available yet or reconnect failed: %s. Waiting 2 s...",
+        e.GetDescription());
+    } catch (const std::exception & e) {
+      RCLCPP_WARN(
+        get_logger(),
+        "Camera not available yet or reconnect failed: %s. Waiting 2 s...",
+        e.what());
+    }
+
+    close_camera_safely();
+    std::this_thread::sleep_for(2s);
+  }
+}
+
 void BaslerExtTriggerNode::grab_loop()
 {
-  while (rclcpp::ok() && !stop_requested_ && camera_.IsGrabbing()) {
+  while (rclcpp::ok() && !stop_requested_) {
+    if (!camera_.IsOpen() || !camera_.IsGrabbing()) {
+      RCLCPP_WARN(get_logger(), "Camera is not grabbing. Waiting for reconnect...");
+      wait_and_reconnect_camera();
+      continue;
+    }
+
     try {
       CBaslerUniversalGrabResultPtr ptr;
       const bool got_result = camera_.RetrieveResult(
@@ -554,8 +619,19 @@ void BaslerExtTriggerNode::grab_loop()
         break;
       }
     } catch (const GenICam::GenericException & e) {
-      RCLCPP_ERROR(get_logger(), "Grab loop exception: %s", e.GetDescription());
-      std::this_thread::sleep_for(100ms);
+      RCLCPP_ERROR(
+        get_logger(),
+        "Grab loop exception: %s. Camera probably disconnected; node stays alive and waits for reconnect.",
+        e.GetDescription());
+      close_camera_safely();
+      wait_and_reconnect_camera();
+    } catch (const std::exception & e) {
+      RCLCPP_ERROR(
+        get_logger(),
+        "Grab loop std::exception: %s. Node stays alive and waits for reconnect.",
+        e.what());
+      close_camera_safely();
+      wait_and_reconnect_camera();
     }
   }
 }
