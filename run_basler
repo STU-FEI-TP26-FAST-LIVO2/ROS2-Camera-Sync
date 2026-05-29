@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+WS_DIR="${1:-$HOME/basler_ext_trigger_cpp_ws}"
+ROS_SETUP="/opt/ros/humble/setup.bash"
+PKG_NAME="basler_ext_trigger_cpp"
+LAUNCH_FILE="ext_trigger_camera.launch.py"
+
+LOG_DIR="${WS_DIR}/logs"
+OUT_DIR="/home/dominik/basler_trigger_output_cpp"
+
+TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
+LOG_FILE="${LOG_DIR}/run_${TIMESTAMP}.log"
+OUT_LOG_FILE="${OUT_DIR}/terminal_${TIMESTAMP}.txt"
+SESSION_FILE="${OUT_DIR}/session_info_${TIMESTAMP}.txt"
+
+echo "=== Basler external trigger launcher ==="
+echo "Workspace: ${WS_DIR}"
+
+if [ ! -d "${WS_DIR}" ]; then
+  echo "Chyba: workspace neexistuje: ${WS_DIR}"
+  exit 1
+fi
+
+if [ ! -f "${ROS_SETUP}" ]; then
+  echo "Chyba: nenasiel som ROS setup: ${ROS_SETUP}"
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}"
+mkdir -p "${OUT_DIR}"
+
+{
+  echo "timestamp=${TIMESTAMP}"
+  echo "workspace=${WS_DIR}"
+  echo "output_dir=${OUT_DIR}"
+  echo "pkg=${PKG_NAME}"
+  echo "launch_file=${LAUNCH_FILE}"
+  echo "host=$(hostname)"
+  echo "user=$(whoami)"
+} > "${SESSION_FILE}"
+
+echo "[1/5] Source ROS 2 Humble"
+set +u
+# shellcheck disable=SC1090
+source "${ROS_SETUP}"
+set -u
+
+if [ ! -f "${WS_DIR}/install/setup.bash" ]; then
+  echo "[2/5] install/setup.bash neexistuje -> idem buildit workspace"
+  cd "${WS_DIR}"
+  colcon build --symlink-install 2>&1 | tee "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+else
+  echo "[2/5] Workspace uz vyzera byt buildnuty" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+fi
+
+if [ ! -f "${WS_DIR}/install/setup.bash" ]; then
+  echo "Chyba: po build-e stale neexistuje ${WS_DIR}/install/setup.bash" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+  exit 1
+fi
+
+echo "[3/5] Source workspace" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+set +u
+# shellcheck disable=SC1090
+source "${WS_DIR}/install/setup.bash"
+set -u
+
+echo "[4/5] Kontrola balika ${PKG_NAME}" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+if ! ros2 pkg list | grep -qx "${PKG_NAME}"; then
+  {
+    echo "Chyba: ROS nevidi balik ${PKG_NAME}"
+    echo "Skus:"
+    echo "  cd ${WS_DIR}"
+    echo "  rm -rf build install log"
+    echo "  source ${ROS_SETUP}"
+    echo "  colcon build --symlink-install"
+  } | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+  exit 1
+fi
+
+echo "[5/5] Spustam launch ${PKG_NAME} ${LAUNCH_FILE}" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+echo "Log workspace: ${LOG_FILE}" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+echo "Log output dir: ${OUT_LOG_FILE}" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+echo "Session info: ${SESSION_FILE}" | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
+
+cd "${WS_DIR}"
+ros2 launch "${PKG_NAME}" "${LAUNCH_FILE}" 2>&1 | tee -a "${LOG_FILE}" | tee -a "${OUT_LOG_FILE}"
